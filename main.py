@@ -1,3 +1,6 @@
+import random
+from time import sleep
+
 a_board1 = []
 for i in range(100):
     if i == 3:
@@ -14,12 +17,35 @@ for i in range(100):
         a_board1.append(43)
     elif i == 45:
         a_board1.append(25)
+    elif i == 87:
+        a_board1.append(30)
     else:
         a_board1.append(0)
+b_board1 = []
+for i in range(100):
+    if i % 6 != 5:
+        b_board1.append(2)
+    else:
+        b_board1.append(0)
+
+c_board1 = []
+for i in range(100):
+    if random.randint(0, 6) != 0:
+        c_board1.append(0)
+    elif random.randint(0, 6) == 0:
+        if i < 30:
+            if random.randint(0, 30) == 0:
+                c_board1.append(i+random.randint(30, 60))
+            else:
+                c_board1.append(i+random.randint(1, 10))
+        elif i > 90:
+            if random.randint(0, 30) == 0:
+                c_board1.append(i-random.randint(30, 60))
+            else:
+                c_board1.append(i+random.randint(1, 10))
 
 
 def die():
-    import random
     return random.randint(1, 6)
 
 
@@ -36,12 +62,61 @@ def player_movement(board, pos):
         return pos + steps
 
 
-def player_control(player_dict):
+def player_control(player_dict, chosen_board, auto, silent, mainiac):
+    if chosen_board == "a":
+        board = a_board1
+    elif chosen_board == "b":
+        board = b_board1
+    else:
+        board = c_board1
+
     for j in range(len(player_dict)):
-        player = player_dict[i]
-        player_dict[i] = player_movement(a_board1, player)
-        if player_dict[i] == -1:
-            print(f"Player {i} has won!")
+        player = player_dict[j]
+
+        if not auto:
+            input(f"Player {j+1}, press enter to roll the dice")
+        pos_to_move = player_movement(board, player)
+        player_dict[j] = pos_to_move
+        if mainiac:
+            sleep(3)
+        if not silent:
+            print(f"Player {j+1} is on position {pos_to_move+1}")
+        if player_dict[j] == -1:
+            print(f"Player {j+1} has won!")
+            return True
+    return False
+
+
+def print_board(board):
+    for j in range(len(board)):
+        if board[j] == 0:
+            print(j+1, end="|")
+        else:
+            print(f"#{board[j]+1}", end="|")
+        if j % 10 == 9:
+            print("|")
+
+
+def main():
+    player_count = int(input("How many players? "))
+    player_dict = {j: 0 for j in range(player_count)}
+    chosen_board = input("Which board do you want to play on? (a/b/c) ")
+    if chosen_board != "a" and chosen_board != "b" and chosen_board != "c":
+        print("Invalid input, please try again")
+        return
+    if chosen_board == "a":
+        print_board(a_board1)
+    elif chosen_board == "b":
+        print_board(b_board1)
+    elif chosen_board == "c":
+        print_board(c_board1)
+    auto = input("Do you want to play automatically? (y/n) ") == "y"
+    silent = input("Do you want to play silently? (y/n) ") == "y"
+    mainiac = input("Are you insane (or a masochist)? (y/n) ") == "y"
+    while True:
+        if player_control(player_dict, chosen_board, auto, silent, mainiac):
             break
 
 
+if __name__ == '__main__':
+    main()
