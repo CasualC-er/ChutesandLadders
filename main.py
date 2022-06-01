@@ -28,21 +28,14 @@ for i in range(100):
     else:
         b_board1.append(0)
 
-c_board1 = []
+c_board1 = [0]*100
 for i in range(100):
-    if random.randint(0, 6) != 0:
-        c_board1.append(0)
-    elif random.randint(0, 6) == 0:
-        if i < 30:
-            if random.randint(0, 30) == 0:
-                c_board1.append(i+random.randint(30, 60))
-            else:
-                c_board1.append(i+random.randint(1, 10))
-        elif i > 90:
-            if random.randint(0, 30) == 0:
-                c_board1.append(i-random.randint(30, 60))
-            else:
-                c_board1.append(i+random.randint(1, 10))
+    if random.randint(0, 5) != 0:
+        continue
+    if random.randint(0, 3) == 0 and i < 30:
+        c_board1[i] = i+random.randint(1, 20)
+    elif random.randint(0, 2) == 0 and i > 30:
+        c_board1[i] = i-random.randint(1, 20)
 
 
 def die():
@@ -113,9 +106,12 @@ def main():
     auto = input("Do you want to play automatically? (y/n) ") == "y"
     silent = input("Do you want to play silently? (y/n) ") == "y"
     mainiac = input("Are you insane (or a masochist)? (y/n) ") == "y"
+    turn_count = 0
     while True:
+        turn_count += 1
         if player_control(player_dict, chosen_board, auto, silent, mainiac):
             break
+    print(f"It took {turn_count} turns to win")
 
 
 if __name__ == '__main__':
