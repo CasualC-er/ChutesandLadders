@@ -1,5 +1,18 @@
 import random
 from time import sleep
+from pymongo import MongoClient
+
+client = MongoClient("mongodb://localhost:27017/")
+db = client['AlternativeAssessment']
+top_scores = db['SnakesAndLadders']
+top_3 = []
+scores_loopble = top_scores.find()
+for item in scores_loopble:
+    small = 10**10000
+    if item["score"] < small:
+        top_3.append(item)
+        small = item["score"]
+
 
 a_board1 = []
 for i in range(100):
@@ -90,6 +103,11 @@ def print_board(board):
             print("|")
 
 
+def print_high_scores():
+    for score in top_3:
+        print(f"{score['player']} - {score['score']}")
+
+
 def main():
     player_count = int(input("How many players? "))
     player_dict = {j: 0 for j in range(player_count)}
@@ -106,12 +124,21 @@ def main():
     auto = input("Do you want to play automatically? (y/n) ") == "y"
     silent = input("Do you want to play silently? (y/n) ") == "y"
     mainiac = input("Are you insane (or a masochist)? (y/n) ") == "y"
+    print_top_scores = input("Do you want to see the top scores? (y/n) ") == "y"
+    if print_top_scores:
+        print_high_scores()
     turn_count = 0
     while True:
         turn_count += 1
         if player_control(player_dict, chosen_board, auto, silent, mainiac):
             break
     print(f"It took {turn_count} turns to win")
+    for score in top_3:
+        if score['score'] > turn_count:
+            player_name = input("You topped a previous record! What is your name? ")
+            top_scores.insert_one({'player': player_name, 'score': turn_count})
+            break
+    print_high_scores()
 
 
 if __name__ == '__main__':
